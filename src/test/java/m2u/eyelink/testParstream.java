@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -18,6 +17,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Properties;
 import java.util.Vector;
 
 import org.junit.Assert;
@@ -40,6 +41,82 @@ public class testParstream {
 			+ " and event_time < timestamp '2017-12-23 23:59:59'";
 	
 	@Test
+	public void testJdbcProperties() {
+		System.out.println("start testJdbcConnection");
+		// JDBC driver name and database URL
+		String JDBC_DRIVER = "com.parstream.ParstreamDriver";
+		// String DB_URL =
+		// "jdbc:parstream://m2u-parstream.eastus.cloudapp.azure.com:9043/eyelink?user=parstream&password=Rornfldkf!2";
+		// String DB_URL =
+		// "jdbc:parstream://m2u-parstream.eastus.cloudapp.azure.com:9043/eyelink";
+		String DB_URL = "jdbc:parstream://" + ip + ":" + (port+1) + "/eyelink";
+		// Database credentials
+
+		Connection conn = null;
+		Statement stmt = null;
+		long startTime = System.currentTimeMillis();
+		try {
+			// STEP 2: Register JDBC driver
+			Class.forName(JDBC_DRIVER);
+
+			// STEP 3: Open a connection
+			System.out.println("Connecting to database...");
+			Properties prop = new Properties();
+//			prop.put("PGHOST", ip);
+//			prop.put("PGPORT", port);
+			prop.put("user", user);
+			prop.put("password", pass);
+//			prop.put("PGDBNAME", "eyelink");
+//			prop.put("loginTimeout", 0);
+
+			DriverManager.setLoginTimeout(0);
+//			conn = DriverManager.getConnection(DB_URL, user, pass);
+			conn = DriverManager.getConnection(DB_URL, prop);
+
+			conn.close();
+			System.out.println(conn.isValid(0));
+			
+//			conn.setClientInfo("loginTimeout", "0");
+			Properties props = conn.getClientInfo();
+			Iterator<Object> it = props.keySet().iterator();
+
+			while(it.hasNext()) {
+			    String key = (String) it.next();
+			    String value = (String) props.getProperty(key);
+
+			    System.out.println(key + " : " + value);
+			}
+
+//			System.out.println("getNetworkTimeout : " + conn.getNetworkTimeout());
+//			System.out.println("getNetworkTimeout : " + conn.getNetworkTimeout());
+//			rs.close();
+//			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			// Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			// Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			// finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}// end finally try
+
+		}
+		System.out.println("end!!");
+	}
+	
+//	@Test
 	public void testJdbcConnection() {
 		System.out.println("start testJdbcConnection");
 		// JDBC driver name and database URL
@@ -61,6 +138,7 @@ public class testParstream {
 			// STEP 3: Open a connection
 			System.out.println("Connecting to database...");
 			conn = DriverManager.getConnection(DB_URL, user, pass);
+
 
 			// STEP 4: Execute a query
 			System.out.println("Creating statement...");
@@ -136,7 +214,7 @@ public class testParstream {
 		
 	}
 
-	@Test
+//	@Test
 	public void testSocketConnection() {
 		System.out.println("\n\nstart testSocketConnection");
 		int cnt = 0;
@@ -200,7 +278,7 @@ public class testParstream {
 		Assert.assertTrue(cnt>0);
 	}
 	
-	@Test
+//	@Test
 	public void testSocketConnection2() {
 		System.out.println("\n\nstart testSocketConnection2");
 		int cnt = 0;
