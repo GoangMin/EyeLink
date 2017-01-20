@@ -27,20 +27,21 @@ import org.junit.Test;
 import com.parstream.jdbc4.ParstreamConnection;
 
 public class testParstream {
-	String ip = "m2u-da.eastus.cloudapp.azure.com";
-//	String ip = "m2u-parstream.eastus.cloudapp.azure.com";
+//	String ip = "m2u-da.eastus.cloudapp.azure.com";
+	String ip = "m2u-parstream.eastus.cloudapp.azure.com";
 	int port = 9042;
 	String user = "parstream";
 	String pass = "Rornfldkf!2";
 	// sql = "SELECT count(*) as cnt FROM tb_node_raw";
-	String sql = "select node_id, event_time, event_type, active_power, ampere,         "
-			+ " als_level, dimming_level,          noise_decibel, noise_frequency,    "
-			+ " vibration_x, vibration_y, vibration_z,          (vibration_x + vibration_y + vibration_z) / 3 as vibration   "
-			+ " from tb_node_raw  "
-			+ " where event_time >= timestamp '2016-11-16 00:00:00'   "
-			+ " and event_time < timestamp '2017-12-23 23:59:59'";
+//	String sql = "select node_id, event_time, event_type, active_power, ampere,         "
+//			+ " als_level, dimming_level,          noise_decibel, noise_frequency,    "
+//			+ " vibration_x, vibration_y, vibration_z,          (vibration_x + vibration_y + vibration_z) / 3 as vibration   "
+//			+ " from tb_node_raw  "
+//			+ " where event_time >= timestamp '2016-11-16 00:00:00'   "
+//			+ " and event_time < timestamp '2017-12-23 23:59:59'";
+	String sql = "SELECT count(*) as cnt FROM tb_node_raw";
 	
-	@Test
+//	@Test
 	public void testJdbcProperties() {
 		System.out.println("start testJdbcConnection");
 		// JDBC driver name and database URL
@@ -214,7 +215,7 @@ public class testParstream {
 		
 	}
 
-//	@Test
+	@Test
 	public void testSocketConnection() {
 		System.out.println("\n\nstart testSocketConnection");
 		int cnt = 0;
@@ -232,7 +233,8 @@ public class testParstream {
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 //            out.write("LOGIN 'parstream' 'Rornfldkf!2'\nselect * from tb_node_raw limit 10\nquit\n");
-            out.write(sql);
+//            out.write(sql);
+            out.write("{sql_command:" + sql + "}");
 //			System.out.println(sql);
 
             //			out.write("select * from tb_node_raw limit 10");
@@ -252,7 +254,7 @@ public class testParstream {
 			cnt = 0;
 			while ((ss = in.readLine()) != null) {
 //				sb.append(ss);
-//		        System.out.println(ss);
+		        System.out.println(ss);
 		        cnt++;
 //		        System.out.println(cnt);
 		    }
@@ -265,7 +267,7 @@ public class testParstream {
             out.flush();
             out.close();
 		    in.close();		
-		    System.out.println("Cnt : " + (cnt-4));
+		    System.out.println("Cnt : " + (cnt));
 			long endTime = System.currentTimeMillis();
 			System.out.println("total time : " + (endTime - startTime)
 					/ 1000. + " s");
